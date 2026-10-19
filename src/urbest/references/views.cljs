@@ -199,7 +199,7 @@
   (let [education (filter #(= :education (data/block %)) data/references)
         regions   (count (filter #(re-find #"^Région" (:label %)) education))]
     [{:value (str regions) :label (i18n/t lang :edu-regions)}
-     {:value (i18n/format-count lang (- (count education) regions)) :label (i18n/t lang :edu-schools)}
+     (i18n/t lang :edu-schools)
      {:value (str (data/network-count :la-salle)) :label (i18n/t lang :edu-la-salle)}]))
 
 (defn- education-block []

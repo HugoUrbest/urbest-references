@@ -2,14 +2,14 @@
   "Textes de la page en français et en anglais.
   Les chiffres « utilisateurs » et « établissements » ont été validés par Hugo ;
   les chiffres de résultat (15 %, 2 à 3×) sont ceux du discours Urbest.
-  Les nombres du bloc Éducation sont calculés à partir de data/references.")
+  Le nombre de Régions et d'établissements La Salle est calculé à partir de data/references.")
 
-;; Espaces insécables :   (normale) et   (fine, avant %, ×, :, et dans les milliers).
+;; Espaces insécables : U+00A0 (normale) et U+202F (fine, avant %, ×, : et dans les milliers).
 
 (def translations
   {:fr
    {:meta-title        "Références clients | Urbest"
-    :meta-description  "Plus de 20 000 utilisateurs dans plus de 300 établissements : services généraux, facility managers, Régions et établissements scolaires gèrent leur maintenance avec Urbest."
+    :meta-description  "Plus de 20 000 utilisateurs, des services généraux d'entreprise à plus de 300 établissements scolaires, gèrent leur maintenance avec Urbest."
     :nav-label         "Navigation principale"
     :nav-demo          "Réserver une démo"
     :lang-switch       "English"
@@ -19,7 +19,6 @@
     :hero-title        "Un outil n'a de valeur que si les équipes s'en servent."
     :hero-lead         "Plus de 20 000 personnes utilisent Urbest pour signaler un problème, suivre une intervention et piloter la maintenance de leurs bâtiments. Voici une partie des organisations qui nous font confiance."
     :hero-stats        [{:value "+20 000" :label "utilisateurs"}
-                        {:value "+300" :label "établissements"}
                         {:value "8" :label "pays"}]
     :jump-label        "Aller aux références"
     :jump-sgfm         "Services généraux & FM"
@@ -40,7 +39,7 @@
     :edu-text          "Un radiateur froid un lundi matin, un vidéoprojecteur en panne avant un examen : dans un établissement scolaire, chaque demande touche des élèves. Avec Urbest, enseignants et personnels signalent depuis leur téléphone, les agents savent quoi faire, et le gestionnaire n'a plus à faire le lien. Que vous gériez un établissement ou les lycées de toute une Région."
     :edu-tags          ["Écoles et collèges" "Lycées généraux, professionnels et agricoles" "Enseignement supérieur" "CFA"]
     :edu-regions       "Régions déploient Urbest dans leurs lycées"
-    :edu-schools       "établissements et groupes scolaires"
+    :edu-schools       {:value "+300" :label "établissements scolaires"}
     :edu-la-salle      "établissements du réseau La Salle"
     :edu-marquee       "Logos des clients du secteur de l'éducation"
 
@@ -74,7 +73,7 @@
 
    :en
    {:meta-title        "Customer references | Urbest"
-    :meta-description  "More than 20,000 users across 300+ sites: facility teams, facility managers, regional authorities and schools run their maintenance with Urbest."
+    :meta-description  "More than 20,000 users, from corporate facility teams to over 300 schools, run their maintenance and facility services with Urbest."
     :nav-label         "Main navigation"
     :nav-demo          "Book a demo"
     :lang-switch       "Français"
@@ -84,7 +83,6 @@
     :hero-title        "Software only matters if teams actually use it."
     :hero-lead         "More than 20,000 people use Urbest to report issues, follow up on work orders and run maintenance across their buildings. Here are some of the organisations that trust us."
     :hero-stats        [{:value "20,000+" :label "users"}
-                        {:value "300+" :label "sites"}
                         {:value "8" :label "countries"}]
     :jump-label        "Go to references"
     :jump-sgfm         "Facility services & FM"
@@ -105,7 +103,7 @@
     :edu-text          "A cold radiator on a Monday morning, a broken projector right before an exam: in a school, every request affects students. With Urbest, teachers and staff report issues from their phone, technicians know what to do, and the business manager no longer has to relay everything. Whether you run one school or every high school in a region."
     :edu-tags          ["Primary & middle schools" "General, vocational & agricultural high schools" "Higher education" "Apprenticeship centres"]
     :edu-regions       "French regions roll out Urbest in their high schools"
-    :edu-schools       "schools and school groups"
+    :edu-schools       {:value "300+" :label "schools"}
     :edu-la-salle      "schools in the La Salle network"
     :edu-marquee       "Logos of education customers"
 
@@ -142,9 +140,3 @@
 
 (defn other-lang [lang]
   (if (= :fr lang) :en :fr))
-
-(defn format-count
-  "Nombre arrondi à la dizaine inférieure, précédé (fr) ou suivi (en) de « + »."
-  [lang n]
-  (let [rounded (* 10 (quot n 10))]
-    (if (= :fr lang) (str "+" rounded) (str rounded "+"))))

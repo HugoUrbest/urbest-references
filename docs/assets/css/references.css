@@ -382,8 +382,9 @@ h3 {
 }
 
 .stats--hero {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  max-width: 640px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px clamp(40px, 7vw, 72px);
   margin-top: 40px;
 }
 
@@ -395,12 +396,6 @@ h3 {
   position: absolute;
   top: 0;
   left: 0;
-}
-
-@media (min-width: 560px) {
-  .stats--hero {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 
 .stats--cards {

@@ -146,8 +146,5 @@
        (map #(assoc % :id (or (:logo %) (:label %))))
        (reduce (fn [acc r] (if (some #(= (:id r) (:id %)) acc) acc (conj acc r))) [])))
 
-(defn row-count [b]
-  (count (filter #(= b (block %)) references)))
-
 (defn network-count [r]
   (count (filter #(= r (:reseau %)) references)))

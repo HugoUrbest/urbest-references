@@ -44,8 +44,8 @@ dev/dev.html       page de développement
 
 ## Modifier le contenu
 
-- **Textes et chiffres** : `src/urbest/references/i18n.cljs`. Les chiffres du bloc Éducation
-  (Régions, établissements, réseau La Salle) sont calculés depuis `data.cljs`.
+- **Textes et chiffres** : `src/urbest/references/i18n.cljs`. Dans le bloc Éducation, le nombre
+  de Régions et d'établissements La Salle est calculé depuis `data.cljs`.
 - **Ajouter une référence** : ajouter une ligne dans `data.cljs`, déposer le logo dans
   `logos/source/<identifiant>.(svg|png|jpg|webp)`, puis `npm run build`.
   Sans logo (`:logo nil`), le nom s'affiche en toutes lettres.
