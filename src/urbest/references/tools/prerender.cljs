@@ -40,6 +40,50 @@
   (let [content (fs/readFileSync (path/join out-dir "assets" rel))]
     (str (config/asset rel) "?v=" (-> (crypto/createHash "sha1") (.update content) (.digest "hex") (.slice 0 10)))))
 
+(defn- share-image
+  "Image de partage (LinkedIn, etc.) : adresse absolue obligatoire."
+  [lang]
+  (str config/preview-url "/assets/img/og-references-" (name lang) ".png"))
+
+(defn- structured-data
+  "Données structurées schema.org : l'organisation, la page (avec fil d'Ariane)
+  et la FAQ, reprise mot pour mot du texte visible."
+  [lang]
+  (let [t      #(i18n/t lang %)
+        url    (config/page-url lang)
+        org-id (str config/site-url "/#organization")
+        data   {"@context" "https://schema.org"
+                "@graph"
+                [{"@type"       "Organization"
+                  "@id"         org-id
+                  "name"        "Urbest"
+                  "legalName"   "Urbest SAS"
+                  "url"         (str config/site-url "/")
+                  "logo"        (str config/site-url "/images/landing/urbest-brand.svg")
+                  "description" (t :footer-tagline)
+                  "sameAs"      [config/getapp-url "https://www.capterra.com/p/193375/Urbest/"]}
+                 {"@type"        "WebPage"
+                  "@id"          url
+                  "url"          url
+                  "name"         (t :meta-title)
+                  "description"  (t :meta-description)
+                  "inLanguage"   (name lang)
+                  "dateModified" (:iso config/page-updated)
+                  "about"        {"@id" org-id}
+                  "publisher"    {"@id" org-id}
+                  "breadcrumb"   {"@type" "BreadcrumbList"
+                                  "itemListElement"
+                                  [{"@type" "ListItem" "position" 1 "name" "Urbest" "item" (config/site-page lang "/")}
+                                   {"@type" "ListItem" "position" 2 "name" (t :breadcrumb-page) "item" url}]}}
+                 {"@type"      "FAQPage"
+                  "@id"        (str url "#faq")
+                  "inLanguage" (name lang)
+                  "mainEntity" (for [{:keys [q a]} (t :faq)]
+                                 {"@type" "Question" "name" q
+                                  "acceptedAnswer" {"@type" "Answer" "text" a}})}]}]
+    ;; « </ » échappé pour ne jamais fermer la balise <script> par accident.
+    (str/replace (js/JSON.stringify (clj->js data)) "</" "<\\/")))
+
 (defn- head [lang]
   (let [t #(esc (i18n/t lang %))]
     (str/join
@@ -61,6 +105,16 @@
       (str "<meta property=\"og:description\" content=\"" (t :meta-description) "\">")
       (str "<meta property=\"og:url\" content=\"" (config/page-url lang) "\">")
       (str "<meta property=\"og:locale\" content=\"" (if (= :fr lang) "fr_FR" "en_GB") "\">")
+      "<meta property=\"og:site_name\" content=\"Urbest\">"
+      (str "<meta property=\"og:image\" content=\"" (share-image lang) "\">")
+      "<meta property=\"og:image:width\" content=\"1200\">"
+      "<meta property=\"og:image:height\" content=\"630\">"
+      (str "<meta property=\"og:image:alt\" content=\"" (t :meta-title) "\">")
+      "<meta name=\"twitter:card\" content=\"summary_large_image\">"
+      (str "<meta name=\"twitter:title\" content=\"" (t :meta-title) "\">")
+      (str "<meta name=\"twitter:description\" content=\"" (t :meta-description) "\">")
+      (str "<meta name=\"twitter:image\" content=\"" (share-image lang) "\">")
+      (str "<script type=\"application/ld+json\">" (structured-data lang) "</script>")
       (str "<link rel=\"icon\" href=\"" (config/asset "img/favicon.svg") "\" type=\"image/svg+xml\">")
       (str "<link rel=\"preload\" href=\"" (config/asset "fonts/proxima-nova-black.woff2") "\" as=\"font\" type=\"font/woff2\" crossorigin>")
       (str "<link rel=\"preload\" href=\"" (config/asset "fonts/proxima-nova-regular.woff2") "\" as=\"font\" type=\"font/woff2\" crossorigin>")

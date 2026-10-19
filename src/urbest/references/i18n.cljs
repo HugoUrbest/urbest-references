@@ -8,16 +8,17 @@
 
 (def translations
   {:fr
-   {:meta-title        "Références clients | Urbest"
-    :meta-description  "Plus de 20 000 utilisateurs, des services généraux d'entreprise à plus de 300 établissements scolaires, gèrent leur maintenance avec Urbest."
+   {:meta-title        "Références GMAO : services généraux et lycées | Urbest"
+    :meta-description  "Plus de 20 000 utilisateurs gèrent leurs demandes d'intervention avec Urbest : sièges, santé, commerce, collectivités et plus de 300 établissements scolaires."
     :nav-label         "Navigation principale"
     :nav-demo          "Réserver une démo"
     :lang-switch       "English"
     :lang-switch-label "Read this page in English"
 
     :hero-eyebrow      "Références clients"
-    :hero-title        "Un outil n'a de valeur que si les équipes s'en servent."
-    :hero-lead         "Plus de 20 000 personnes utilisent Urbest pour signaler un problème, suivre une intervention et piloter la maintenance de leurs bâtiments. Voici une partie des organisations qui nous font confiance."
+    :hero-title        "Ils pilotent la maintenance de leurs bâtiments avec Urbest."
+    :hero-subtitle     "Un outil n'a de valeur que si les équipes s'en servent."
+    :hero-lead         "Urbest est un logiciel de GMAO et de gestion des demandes d'intervention. Plus de 20 000 personnes l'utilisent pour signaler un problème, suivre une intervention et piloter la maintenance de leurs bâtiments. Voici une partie des organisations qui nous font confiance."
     :hero-stats        [{:value "+20 000" :label "utilisateurs"}
                         {:value "+7 millions" :label "de m² gérés avec Urbest"}
                         {:value "8" :label "pays"}]
@@ -44,11 +45,46 @@
     :edu-la-salle      "établissements du réseau La Salle"
     :edu-marquee       "Logos des clients du secteur de l'éducation"
 
+    :refs-list         "Voir la liste des références"
+
     :marquee-pause     "Mettre en pause le défilement des logos"
     :marquee-play      "Reprendre le défilement des logos"
 
+    :testimonials-eyebrow "Témoignages"
+    :testimonials-title "Ce qui a changé chez eux"
+    :testimonials      [{:tag     "Éducation"
+                         :title   "Un lycée public de Caen, en Normandie"
+                         :text    "Environ 1 200 élèves. Toutes les demandes de maintenance passent désormais par Urbest, du signalement à la clôture."
+                         :figures [{:value "6 à 8" :label "demandes traitées par jour"}
+                                   {:value "≈ 1 h" :label "gagnée par technicien et par jour"}]
+                         :quote   "Je peux montrer que notre équipe est réactive."
+                         :author  "Responsable de site"}
+                        {:tag     "Services généraux"
+                         :title   "Paris La Défense"
+                         :text    "Employés, gardiens et responsables des bureaux utilisent Urbest au quotidien pour l'exploitation et la maintenance, avec un retour à chaque demandeur."
+                         :quote   "Nous avons constaté une vraie amélioration dans la gestion des demandes d'intervention."
+                         :author  "Responsable workplace, Paris La Défense"}]
+    :source            "Source"
+
+    :faq-eyebrow       "Questions fréquentes"
+    :faq-title         "Urbest en quelques questions"
+    :faq               [{:q "Qu'est-ce qu'Urbest ?"
+                         :a "Urbest est un logiciel de GMAO et de gestion des demandes d'intervention pour les organisations qui gèrent un ou plusieurs bâtiments. Occupants, équipes techniques et prestataires y signalent une demande avec photo, la suivent et la clôturent, depuis le web ou l'application mobile."}
+                        {:q "Qui utilise Urbest ?"
+                         :a "Plus de 20 000 utilisateurs dans 8 pays : services généraux d'entreprise, santé, collectivités, commerce, résidences, et plus de 300 établissements scolaires, dont les lycées des Régions Normandie, Centre-Val de Loire et Auvergne-Rhône-Alpes."}
+                        {:q "Urbest est-il adapté aux lycées et aux Régions ?"
+                         :a "Oui. Enseignants et personnels signalent depuis leur téléphone, les agents savent quoi faire, et le gestionnaire suit tout au même endroit. Urbest sert aussi bien un établissement seul qu'une Région pour l'ensemble de ses lycées."}
+                        {:q "Quelle différence avec une GMAO industrielle ?"
+                         :a "Une GMAO industrielle est construite autour des équipements et de la maintenance des machines. Urbest est construit autour du flux de demandes entre occupants, responsables et prestataires, sur un ou plusieurs sites."}
+                        {:q "Comment démarrer avec Urbest ?"
+                         :a "Demandez une démo : nous répondons à vos questions et paramétrons votre premier bâtiment ou votre patrimoine. Une période d'essai de 30 jours est incluse."}
+                        {:q "Quelle est la note d'Urbest sur les plateformes d'avis ?"
+                         :a "4,8/5 sur GetApp, sur 33 avis."}]
+    :updated           "Dernière mise à jour : "
+    :breadcrumb-page   "Références clients"
+
     :demo-eyebrow      "Rejoignez-les"
-    :demo-title        "Démarrez en moins de 30 minutes"
+    :demo-title        "Voyez Urbest sur votre propre bâtiment"
     :demo-includes     "La démo comprend :"
     :demo-items        ["Questions et réponses"
                         "Le paramétrage de votre patrimoine ou bâtiment"
@@ -73,16 +109,17 @@
     :footer-contact    "Contact"}
 
    :en
-   {:meta-title        "Customer references | Urbest"
-    :meta-description  "More than 20,000 users, from corporate facility teams to over 300 schools, run their maintenance and facility services with Urbest."
+   {:meta-title        "CMMS customer references: facility services and schools | Urbest"
+    :meta-description  "More than 20,000 users manage their work requests with Urbest: headquarters, healthcare, retail, public sector and over 300 schools."
     :nav-label         "Main navigation"
     :nav-demo          "Book a demo"
     :lang-switch       "Français"
     :lang-switch-label "Lire cette page en français"
 
     :hero-eyebrow      "Customer references"
-    :hero-title        "Software only matters if teams actually use it."
-    :hero-lead         "More than 20,000 people use Urbest to report issues, follow up on work orders and run maintenance across their buildings. Here are some of the organisations that trust us."
+    :hero-title        "They run maintenance across their buildings with Urbest."
+    :hero-subtitle     "Software only matters if teams actually use it."
+    :hero-lead         "Urbest is CMMS and work request management software. More than 20,000 people use it to report issues, follow up on work orders and run maintenance across their buildings. Here are some of the organisations that trust us."
     :hero-stats        [{:value "20,000+" :label "users"}
                         {:value "7M+" :label "m² managed with Urbest"}
                         {:value "8" :label "countries"}]
@@ -109,11 +146,46 @@
     :edu-la-salle      "schools in the La Salle network"
     :edu-marquee       "Logos of education customers"
 
+    :refs-list         "See the full list of references"
+
     :marquee-pause     "Pause the logo animation"
     :marquee-play      "Resume the logo animation"
 
+    :testimonials-eyebrow "Testimonials"
+    :testimonials-title "What changed for them"
+    :testimonials      [{:tag     "Education"
+                         :title   "A public high school in Caen, Normandy"
+                         :text    "About 1,200 students. Every maintenance request now goes through Urbest, from report to closure."
+                         :figures [{:value "6–8" :label "requests handled per day"}
+                                   {:value "≈ 1 h" :label "saved per technician per day"}]
+                         :quote   "I can show that our team is responsive."
+                         :author  "Site manager (translated from French)"}
+                        {:tag     "Facility services"
+                         :title   "Paris La Défense"
+                         :text    "Employees, caretakers and office managers use Urbest every day for operations and maintenance, with feedback to every requester."
+                         :quote   "We noticed a real improvement in job requests management."
+                         :author  "Workplace manager, Paris La Défense"}]
+    :source            "Source"
+
+    :faq-eyebrow       "Frequently asked questions"
+    :faq-title         "Urbest in a few questions"
+    :faq               [{:q "What is Urbest?"
+                         :a "Urbest is CMMS and work request management software for organisations that manage one or more buildings. Occupants, technical teams and service providers report a request with a photo, track it and close it, on the web or in the mobile app."}
+                        {:q "Who uses Urbest?"
+                         :a "More than 20,000 users in 8 countries: corporate facility teams, healthcare, public sector, retail, residential, and over 300 schools, including the high schools of the Normandy, Centre-Val de Loire and Auvergne-Rhône-Alpes regions."}
+                        {:q "Is Urbest suited to schools and regional authorities?"
+                         :a "Yes. Teachers and staff report issues from their phone, technicians know what to do, and the business manager follows everything in one place. Urbest works for a single school as well as for a region running all of its high schools."}
+                        {:q "How is it different from an industrial CMMS?"
+                         :a "An industrial CMMS is built around equipment and machine maintenance. Urbest is built around the flow of requests between occupants, managers and service providers, across one or more sites."}
+                        {:q "How do I get started with Urbest?"
+                         :a "Book a demo: we answer your questions and set up your first building or your portfolio. A 30-day trial is included."}
+                        {:q "How is Urbest rated on review platforms?"
+                         :a "4.8/5 on GetApp, from 33 reviews."}]
+    :updated           "Last updated: "
+    :breadcrumb-page   "Customer references"
+
     :demo-eyebrow      "Join them"
-    :demo-title        "Get started in less than 30 minutes"
+    :demo-title        "See Urbest on your own building"
     :demo-includes     "Demo includes:"
     :demo-items        ["Questions and answers"
                         "Customisation of your first building"

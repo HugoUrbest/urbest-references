@@ -23,6 +23,17 @@
 
 (def getapp-url "https://www.getapp.com/operations-management-software/a/urbest/")
 
+(def govlaunch-url
+  "https://govlaunch.com/fr/projects/paris-la-defenses-workplace-experience-improved-with-urbest")
+
+;; Adresse publique de l'aperçu GitHub Pages : les images de partage (LinkedIn)
+;; doivent être données en adresse absolue.
+(def preview-url "https://hugourbest.github.io/urbest-references")
+
+;; Date affichée sous la FAQ et dans les données structurées : à mettre à jour
+;; à chaque modification de contenu.
+(def page-updated {:iso "2026-10-19" :fr "19 octobre 2026" :en "19 October 2026"})
+
 (defn asset [& parts]
   (apply str assets-path parts))
 

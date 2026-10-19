@@ -51,6 +51,11 @@ dev/dev.html       page de développement
   Sans logo (`:logo nil`), le nom s'affiche en toutes lettres.
 - Les lignes qui partagent un logo (plusieurs sites CBRE, Engie, Advantail…) n'apparaissent
   qu'une fois dans le bandeau.
+- **Témoignages et FAQ** : aussi dans `i18n.cljs` ; la FAQ alimente les données structurées
+  (schema.org FAQPage) générées par `tools/prerender.cljs`. Mettre à jour `page-updated`
+  dans `config.cljs` à chaque modification de contenu.
+- **Image de partage LinkedIn** : `docs/assets/img/og-references-(fr|en).png`, régénérée par
+  `npm run build` (`tools/share_image.cljs`, police Proxima Nova installée sur la machine).
 - Le build échoue, sans réécrire les pages, si une référence pointe vers un logo absent de
   `logos.cljs` (relancer `npm run logos`) ou si une traduction manque dans l'une des langues.
 

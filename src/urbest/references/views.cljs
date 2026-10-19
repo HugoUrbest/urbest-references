@@ -106,6 +106,8 @@
                 :width    width
                 :height   height
                 :decoding "async"
+                ;; Chargés à l'approche du bandeau (voir load-when-near!).
+                :loading  "lazy"
                 :draggable false}]
     [:span.logo.logo--text {:title label} label]))
 
@@ -118,11 +120,28 @@
      [:ul.marquee__track (items false)]
      [:ul.marquee__track {:aria-hidden true} (items true)]]))
 
+(defn- load-when-near!
+  "Charge tous les logos d'un bandeau quand il approche de l'écran. Le chargement
+  différé natif (loading=lazy) ne voit pas les logos qui entrent par le côté d'un
+  bandeau animé : ils resteraient vides. Fonction de « ref » React, définie une
+  seule fois pour ne pas recréer l'observateur à chaque rendu."
+  [^js el]
+  (when (and el (exists? js/IntersectionObserver))
+    (.observe (js/IntersectionObserver.
+               (fn [entries ^js observer]
+                 (when (some #(.-isIntersecting ^js %) entries)
+                   (doseq [^js img (array-seq (.querySelectorAll el "img"))]
+                     (set! (.-loading img) "eager"))
+                   (.disconnect observer)))
+               #js {:rootMargin "400px 0px"})
+              el)))
+
 (defn- marquee [id label-key]
   (let [lang    @(rf/subscribe [:lang])
         paused? @(rf/subscribe [:paused? id])
         refs    (data/logos-for id)]
-    [:div.marquee {:class      (when paused? "is-paused")
+    [:div.marquee {:ref        load-when-near!
+                   :class      (when paused? "is-paused")
                    :role       "region"
                    :aria-label (i18n/t lang label-key)}
      [:button.marquee__toggle {:type         "button"
@@ -162,14 +181,28 @@
     [:div.hero__content
      [:p.eyebrow (t :hero-eyebrow)]
      [:h1#hero-title.hero__title (t :hero-title)]
+     [:p.hero__subtitle (t :hero-subtitle)]
      [:p.hero__lead (t :hero-lead)]
      [stats (t :hero-stats) {:modifier "stats--hero"}]
-     [:nav.jump {:aria-label (t :jump-label)}
-      [:a.jump__link {:href "#services-generaux"} (t :jump-sgfm)]
-      [:a.jump__link {:href "#education"} (t :jump-education)]]]
+     [:div.hero__actions
+      [:a.button {:href "#demo"} (t :nav-demo)]
+      [:nav.jump {:aria-label (t :jump-label)}
+       [:a.jump__link {:href "#services-generaux"} (t :jump-sgfm)]
+       [:a.jump__link {:href "#education"} (t :jump-education)]]]]
     [hero-art]]])
 
 ;; ── Blocs de références ─────────────────────────────────────────────────────
+
+(defn- references-list
+  "Les références en texte sous le bandeau : les moteurs de recherche et les
+  assistants IA ne lisent pas les logos."
+  [id]
+  (let [names (->> (data/logos-for id) (map :label) distinct (sort-by #(.toLocaleLowerCase %)))]
+    [:div.container
+     [:details.refs
+      [:summary.refs__toggle (str (t :refs-list) " (" (count names) ")")]
+      [:ul.refs__list
+       (for [n names] ^{:key n} [:li n])]]]))
 
 (defn- references-block [{:keys [id anchor modifier eyebrow title text tag-list figures source pattern]}]
   [:section.block {:id anchor :class modifier :aria-labelledby (str anchor "-title")}
@@ -179,11 +212,13 @@
      [:p.eyebrow eyebrow]
      [:h2.block__title {:id (str anchor "-title")} title]
      [:p.block__text text]
-     [tags tag-list]]
+     [tags tag-list]
+     [:a.button.block__cta {:href "#demo"} (t :nav-demo)]]
     [:div.block__figures
      [stats figures {:modifier "stats--cards"}]
      (when source [:p.block__source source])]]
-   [marquee id (if (= :education id) :edu-marquee :sgfm-marquee)]])
+   [marquee id (if (= :education id) :edu-marquee :sgfm-marquee)]
+   [references-list id]])
 
 (defn- sgfm-block []
   [references-block {:id       :sg-fm
@@ -214,6 +249,47 @@
                        :text     (t :edu-text)
                        :tag-list (t :edu-tags)
                        :figures  (education-figures lang)}]))
+
+;; ── Témoignages ─────────────────────────────────────────────────────────────
+
+(defn- testimonials []
+  (let [lang @(rf/subscribe [:lang])]
+    [:section.testimonials {:aria-labelledby "testimonials-title"}
+     [:div.container
+      [:p.eyebrow (t :testimonials-eyebrow)]
+      [:h2#testimonials-title.block__title (t :testimonials-title)]
+      [:div.testimonials__grid
+       (for [{:keys [tag title text figures quote author source]} (t :testimonials)]
+         ^{:key title}
+         [:figure.testimonial
+          [:p.testimonial__tag tag]
+          [:h3.testimonial__title title]
+          [:p.testimonial__text text]
+          (when figures [stats figures {:modifier "stats--testimonial"}])
+          [:blockquote.testimonial__quote [:p (str "« " quote " »")]]
+          [:figcaption.testimonial__author
+           author
+           (when source
+             [:<> " · " [:a {:href config/govlaunch-url :rel "noopener" :target "_blank"}
+                         (str (i18n/t lang :source) " : " source)]])]])]]]))
+
+;; ── FAQ ─────────────────────────────────────────────────────────────────────
+;; Texte toujours visible (pas d'accordéon) : lisible par les moteurs et les IA,
+;; et repris dans les données structurées FAQPage.
+
+(defn- faq []
+  (let [lang @(rf/subscribe [:lang])]
+    [:section.faq {:id "faq" :aria-labelledby "faq-title"}
+     [:div.container.faq__inner
+      [:p.eyebrow (t :faq-eyebrow)]
+      [:h2#faq-title.block__title (t :faq-title)]
+      [:dl.faq__list
+       (for [{:keys [q a]} (t :faq)]
+         ^{:key q}
+         [:div.faq__item [:dt q] [:dd a]])]
+      [:p.faq__updated
+       (t :updated)
+       [:time {:date-time (:iso config/page-updated)} (get config/page-updated lang)]]]]))
 
 ;; ── Démo ────────────────────────────────────────────────────────────────────
 ;; Mêmes champs (noms et contrôles) que le formulaire des autres pages d'urbest.io.
@@ -307,5 +383,7 @@
     [hero]
     [sgfm-block]
     [education-block]
+    [testimonials]
+    [faq]
     [demo]]
    [site-footer]])
