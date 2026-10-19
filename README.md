@@ -51,6 +51,8 @@ dev/dev.html       page de développement
   Sans logo (`:logo nil`), le nom s'affiche en toutes lettres.
 - Les lignes qui partagent un logo (plusieurs sites CBRE, Engie, Advantail…) n'apparaissent
   qu'une fois dans le bandeau.
+- Le build échoue, sans réécrire les pages, si une référence pointe vers un logo absent de
+  `logos.cljs` (relancer `npm run logos`) ou si une traduction manque dans l'une des langues.
 
 ## Harmonisation des logos
 
@@ -68,6 +70,8 @@ Réglages par logo dans `src/urbest/references/tools/logos.cljs` (`options`) :
 Le dossier `docs/` est le site : *Settings → Pages → Deploy from a branch → main / docs*.
 La racine redirige vers `fr/` ou `en/` selon la langue du navigateur.
 Les pages portent une balise `noindex` tant qu'elles servent de prévisualisation.
+Les adresses du JS et du CSS portent une empreinte de leur contenu (`?v=…`), recalculée à chaque
+build : un visiteur ne peut pas combiner une page à jour avec un ancien bundle resté en cache.
 
 ## Intégration à urbest.io
 
@@ -79,6 +83,10 @@ Les pages portent une balise `noindex` tant qu'elles servent de prévisualisatio
 - L'en-tête et le pied de page sont volontairement simples : à remplacer par ceux du site.
 - Le formulaire utilise le même script Google Apps Script que `landings.js` et redirige vers
   `/{lang}/demo-request-success/`. Le suivi Capterra est appelé s'il est présent sur la page.
+  Le bouton « Envoyer » est désactivé dans le HTML pré-rendu et ne s'active qu'une fois le
+  JavaScript chargé ; le formulaire est en `method="post"`, si bien que les coordonnées ne
+  passent jamais dans l'URL. L'envoi est abandonné au bout de 20 s avec un message d'erreur
+  (`DEMO_TIMEOUT_MS` dans `config.cljs`).
 - Police : la page utilise Proxima Nova (fichiers du brandbook convertis en WOFF2), avec
   CircularStd, la police d'urbest.io, en secours. **Vérifier que la licence Proxima Nova
   couvre l'usage web** ; sinon, supprimer les `@font-face` de `references.css` et la page

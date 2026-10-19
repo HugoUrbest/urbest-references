@@ -1,5 +1,6 @@
 (ns urbest.references.views
   (:require [re-frame.core :as rf]
+            [reagent.core :as r]
             [urbest.references.config :as config]
             [urbest.references.data :as data]
             [urbest.references.i18n :as i18n]
@@ -222,6 +223,24 @@
    [:label.field__label {:for id} label]
    [:input.field__input (merge {:id id :name id :type type :required required?} attrs)]])
 
+(defn- submit-button
+  "Désactivé dans le HTML pré-rendu ; activé une fois monté dans le navigateur.
+  Sans JavaScript, le formulaire ne peut donc pas partir en envoi natif, qui
+  perdrait la demande."
+  []
+  (r/create-class
+   {:display-name        "submit-button"
+    :component-did-mount #(rf/dispatch [:demo-ready])
+    :reagent-render
+    (fn []
+      (let [status   @(rf/subscribe [:demo-status])
+            ready?   @(rf/subscribe [:demo-ready?])
+            sending? (= :sending status)]
+        [:button.button.button--block {:type      "submit"
+                                       :disabled  (or (not ready?) sending?)
+                                       :aria-busy sending?}
+         (if sending? (t :form-sending) (t :form-submit))]))}))
+
 (defn- demo []
   (let [lang   @(rf/subscribe [:lang])
         status @(rf/subscribe [:demo-status])]
@@ -235,7 +254,10 @@
         [:p.demo__includes (t :demo-includes)]
         [:ul.demo__list
          (for [item (t :demo-items)] ^{:key item} [:li item])]]]
+      ;; method post : même en cas d'envoi natif, les coordonnées ne partent
+      ;; jamais dans l'URL (historique, journaux du serveur).
       [:form.demo__form {:id         "demo-form"
+                         :method     "post"
                          :on-submit  (fn [e]
                                        (.preventDefault e)
                                        (rf/dispatch [:submit-demo (js/FormData. (.-currentTarget e))]))}
@@ -260,10 +282,7 @@
          :error    [:p.demo__message.demo__message--error {:role "alert"} (t :form-error)]
          :dev-sent [:p.demo__message {:role "status"} (t :form-dev-sent)]
          nil)
-       [:button.button.button--block {:type      "submit"
-                                      :disabled  (= :sending status)
-                                      :aria-busy (= :sending status)}
-        (if (= :sending status) (t :form-sending) (t :form-submit))]]]]))
+       [submit-button]]]]))
 
 ;; ── Pied de page ────────────────────────────────────────────────────────────
 

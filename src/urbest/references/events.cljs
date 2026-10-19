@@ -22,6 +22,11 @@
 ;; Même fonctionnement que landings.js sur urbest.io : envoi au script Google,
 ;; puis redirection vers la page de confirmation de la langue courante.
 
+(rf/reg-event-db
+ :demo-ready
+ (fn [db _]
+   (assoc-in db [:demo :ready?] true)))
+
 (rf/reg-event-fx
  :submit-demo
  (fn [{:keys [db]} [_ form-data]]
@@ -49,6 +54,14 @@
 
 ;; ── Effets ──────────────────────────────────────────────────────────────────
 
+(defn- abort-after
+  "AbortController annulé au bout de ms millisecondes (AbortSignal.timeout
+  n'existe pas sur les navigateurs plus anciens)."
+  [ms]
+  (let [controller (js/AbortController.)]
+    {:signal (.-signal controller)
+     :timer  (js/setTimeout #(.abort controller) ms)}))
+
 (rf/reg-fx
  :urbest/post-demo
  (fn [{:keys [form-data on-success on-failure on-dev]}]
@@ -56,13 +69,18 @@
      (do (js/console.info "Démo (dev) : formulaire non envoyé"
                           (js/Object.fromEntries (.entries form-data)))
          (rf/dispatch on-dev))
-     (-> (js/fetch (str config/DEMO_ENDPOINT "?" (js/URLSearchParams. form-data))
-                   #js {:method  "POST"
-                        :headers #js {"Content-type" "application/x-www-form-urlencoded; charset=UTF-8"}})
-         (.then #(.json %))
-         (.then (fn [^js data]
-                  (rf/dispatch (if (= "success" (.-result data)) on-success on-failure))))
-         (.catch #(rf/dispatch on-failure))))))
+     ;; Sans délai maximal, une requête bloquée laisserait le bouton sur
+     ;; « Envoi en cours… » indéfiniment.
+     (let [{:keys [signal timer]} (abort-after config/DEMO_TIMEOUT_MS)]
+       (-> (js/fetch (str config/DEMO_ENDPOINT "?" (js/URLSearchParams. form-data))
+                     #js {:method  "POST"
+                          :headers #js {"Content-type" "application/x-www-form-urlencoded; charset=UTF-8"}
+                          :signal  signal})
+           (.then #(.json %))
+           (.then (fn [^js data]
+                    (rf/dispatch (if (= "success" (.-result data)) on-success on-failure))))
+           (.catch #(rf/dispatch on-failure))
+           (.finally #(js/clearTimeout timer)))))))
 
 (rf/reg-fx
  :urbest/redirect

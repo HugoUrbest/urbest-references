@@ -5,14 +5,17 @@
   le bundle navigateur l'« hydrate » ensuite pour les interactions.
   Par défaut les pages portent une balise noindex (prévisualisation GitHub Pages) :
   URBEST_INDEX=1 npm run build la retire pour la mise en ligne sur urbest.io."
-  (:require ["fs" :as fs]
+  (:require ["crypto" :as crypto]
+            ["fs" :as fs]
             ["path" :as path]
             [clojure.string :as str]
             [re-frame.core :as rf]
             [reagent.dom.server :as rds]
             [urbest.references.config :as config]
+            [urbest.references.data :as data]
             [urbest.references.events]
             [urbest.references.i18n :as i18n]
+            [urbest.references.logos :as logos]
             [urbest.references.subs]
             [urbest.references.views :as views]))
 
@@ -27,6 +30,15 @@
 
 (defn- indexable? []
   (= "1" (.. js/process -env -URBEST_INDEX)))
+
+(defn- versioned
+  "Adresse d'une ressource suivie de l'empreinte de son contenu (?v=…).
+  Chaque build change l'adresse du JS et du CSS : un navigateur ne peut plus
+  associer une page à jour avec un ancien bundle resté en cache (GitHub Pages
+  met les fichiers en cache 10 minutes)."
+  [rel]
+  (let [content (fs/readFileSync (path/join out-dir "assets" rel))]
+    (str (config/asset rel) "?v=" (-> (crypto/createHash "sha1") (.update content) (.digest "hex") (.slice 0 10)))))
 
 (defn- head [lang]
   (let [t #(esc (i18n/t lang %))]
@@ -52,8 +64,8 @@
       (str "<link rel=\"icon\" href=\"" (config/asset "img/favicon.svg") "\" type=\"image/svg+xml\">")
       (str "<link rel=\"preload\" href=\"" (config/asset "fonts/proxima-nova-black.woff2") "\" as=\"font\" type=\"font/woff2\" crossorigin>")
       (str "<link rel=\"preload\" href=\"" (config/asset "fonts/proxima-nova-regular.woff2") "\" as=\"font\" type=\"font/woff2\" crossorigin>")
-      (str "<link rel=\"stylesheet\" href=\"" (config/asset "css/references.css") "\">")
-      (str "<script src=\"" (config/asset "js/main.js") "\" defer></script>")])))
+      (str "<link rel=\"stylesheet\" href=\"" (versioned "css/references.css") "\">")
+      (str "<script src=\"" (versioned "js/main.js") "\" defer></script>")])))
 
 ;; Au pré-rendu, les abonnements re-frame sont lus hors composant réactif :
 ;; c'est attendu, on masque donc cet avertissement-là.
@@ -83,14 +95,43 @@
 </html>
 ")
 
+;; ── Contrôles ───────────────────────────────────────────────────────────────
+;; Les vues se rabattent sur le nom en toutes lettres (logo absent) ou sur
+;; « ⟨clé⟩ » (traduction absente) : le build échoue plutôt que de publier ça.
+
+(defn- content-errors []
+  (let [missing (->> data/references (keep :logo) distinct (remove #(contains? logos/manifest %)) sort)
+        fr      (set (keys (:fr i18n/translations)))
+        en      (set (keys (:en i18n/translations)))]
+    (cond-> []
+      (seq missing)
+      (conj (str "logos absents de src/urbest/references/logos.cljs (lancer npm run logos) : "
+                 (str/join ", " missing)))
+      (seq (remove en fr))
+      (conj (str "traductions anglaises manquantes : " (str/join ", " (map name (sort (remove en fr))))))
+      (seq (remove fr en))
+      (conj (str "traductions françaises manquantes : " (str/join ", " (map name (sort (remove fr en)))))))))
+
+(defn- page-errors [lang html]
+  (when-let [k (re-find #"⟨[^⟩]*⟩" html)]
+    [(str "clé de traduction inconnue " k " dans la page " (name lang))]))
+
+;; ── Point d'entrée ──────────────────────────────────────────────────────────
+
 (defn run []
-  (doseq [lang [:fr :en]]
-    (let [file (path/join out-dir (name lang) "index.html")]
-      (fs/mkdirSync (path/dirname file) #js {:recursive true})
-      (fs/writeFileSync file (page lang))
-      (println "Page générée :" file)))
-  (fs/writeFileSync (path/join out-dir "index.html") redirect-page)
-  (fs/writeFileSync (path/join out-dir ".nojekyll") "")
-  (println (if (indexable?)
-             "Pages indexables (URBEST_INDEX=1)."
-             "Pages en noindex (prévisualisation). URBEST_INDEX=1 pour la production.")))
+  (let [pages  (into {} (for [lang [:fr :en]] [lang (page lang)]))
+        errors (concat (content-errors) (mapcat (fn [[lang html]] (page-errors lang html)) pages))]
+    (if (seq errors)
+      (do (doseq [e errors] (println "ERREUR" e))
+          (println "Pages non générées.")
+          (set! (.-exitCode js/process) 1))
+      (do (doseq [[lang html] pages]
+            (let [file (path/join out-dir (name lang) "index.html")]
+              (fs/mkdirSync (path/dirname file) #js {:recursive true})
+              (fs/writeFileSync file html)
+              (println "Page générée :" file)))
+          (fs/writeFileSync (path/join out-dir "index.html") redirect-page)
+          (fs/writeFileSync (path/join out-dir ".nojekyll") "")
+          (println (if (indexable?)
+                     "Pages indexables (URBEST_INDEX=1)."
+                     "Pages en noindex (prévisualisation). URBEST_INDEX=1 pour la production."))))))

@@ -7,6 +7,10 @@
 (goog-define DEMO_ENDPOINT
   "https://script.google.com/macros/s/AKfycbyGeF4GqNzD54UgRsnse5oPaETxMV-cARolW62yQLaWMox1oAkxWGWamP2hXAb7141OCg/exec")
 
+;; Au-delà, l'envoi est abandonné et un message d'erreur s'affiche
+;; (le script Google peut mettre plusieurs secondes à répondre à froid).
+(goog-define DEMO_TIMEOUT_MS 20000)
+
 ;; ── Adresses ────────────────────────────────────────────────────────────────
 
 (def site-url "https://urbest.io")

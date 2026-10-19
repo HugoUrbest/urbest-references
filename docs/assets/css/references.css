@@ -529,7 +529,6 @@ h3 {
   width: 40px;
   height: 40px;
   margin-inline-end: var(--gutter);
-  margin-bottom: -8px;
   padding: 0;
   border: 1.5px solid var(--line);
   border-radius: 50%;
@@ -572,10 +571,17 @@ h3 {
   animation-direction: reverse;
 }
 
-.marquee:hover .marquee__track,
-.marquee:focus-within .marquee__track,
+/* Pause : le bouton (état re-frame) commande les deux rangées. Le survol n'arrête
+   que la rangée survolée, jamais le bouton lui-même, et seulement avec une souris :
+   sur écran tactile, le survol reste « collé » après un appui. */
 .marquee.is-paused .marquee__track {
   animation-play-state: paused;
+}
+
+@media (hover: hover) {
+  .marquee__row:hover .marquee__track {
+    animation-play-state: paused;
+  }
 }
 
 @keyframes marquee {
