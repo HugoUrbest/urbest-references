@@ -274,8 +274,8 @@
                          (str (i18n/t lang :source) " : " source)]])]])]]]))
 
 ;; ── FAQ ─────────────────────────────────────────────────────────────────────
-;; Texte toujours visible (pas d'accordéon) : lisible par les moteurs et les IA,
-;; et repris dans les données structurées FAQPage.
+;; Accordéon natif (details/summary) : les réponses restent dans le HTML, donc
+;; lisibles par les moteurs et les IA, et sont reprises dans les données FAQPage.
 
 (defn- faq []
   (let [lang @(rf/subscribe [:lang])]
@@ -283,10 +283,12 @@
      [:div.container.faq__inner
       [:p.eyebrow (t :faq-eyebrow)]
       [:h2#faq-title.block__title (t :faq-title)]
-      [:dl.faq__list
+      [:div.faq__list
        (for [{:keys [q a]} (t :faq)]
          ^{:key q}
-         [:div.faq__item [:dt q] [:dd a]])]
+         [:details.faq__item
+          [:summary.faq__question q]
+          [:p.faq__answer a]])]
       [:p.faq__updated
        (t :updated)
        [:time {:date-time (:iso config/page-updated)} (get config/page-updated lang)]]]]))
