@@ -1,0 +1,26 @@
+;; Builds :
+;;   :app   — bundle navigateur (hydrate le HTML pré-rendu). Release -> docs/assets/js/main.js
+;;   :tools — script Node : `logos` (harmonisation des logos) et `prerender` (génère docs/fr et docs/en)
+{:source-paths ["src"]
+
+ :dependencies [[reagent "1.2.0"]
+                [re-frame "1.3.0"]]
+
+ ;; En dev : http://localhost:8280/dev.html (page vide, rendu côté client)
+ ;;          http://localhost:8280/fr/      (page pré-rendue, après `npm run build`)
+ :dev-http {8280 {:roots ["docs" "dev"]}}
+
+ :builds
+ {:app   {:target     :browser
+          :output-dir "docs/assets/js"
+          :asset-path "/assets/js"
+          :modules    {:main {:init-fn urbest.references.core/init}}
+          ;; Le build de dev écrit ailleurs pour ne jamais écraser le bundle publié.
+          :dev        {:output-dir      "dev/dev-js"
+                       :asset-path      "/dev-js"
+                       ;; Pas d'envoi réel du formulaire de démo en développement.
+                       :closure-defines {urbest.references.config/DEMO_ENDPOINT ""}}}
+
+  :tools {:target    :node-script
+          :main      urbest.references.tools.cli/main
+          :output-to "target/tools.js"}}}

@@ -1,0 +1,28 @@
+(ns urbest.references.core
+  (:require [re-frame.core :as rf]
+            [reagent.dom.client :as rdc]
+            [urbest.references.events]
+            [urbest.references.subs]
+            [urbest.references.views :as views]))
+
+;; La page publiée est pré-rendue (npm run build) : on « hydrate » le HTML existant.
+;; La page de dev (dev/dev.html) est vide : on rend tout côté navigateur.
+
+(defonce root (atom nil))
+
+(defn- lang []
+  (if (= "en" (.. js/document -documentElement -lang)) :en :fr))
+
+(defn- mount! []
+  (let [el (js/document.getElementById "app")]
+    (reset! root (if (.hasChildNodes el)
+                   (rdc/hydrate-root el [views/root])
+                   (doto (rdc/create-root el) (rdc/render [views/root]))))))
+
+(defn ^:dev/after-load reload! []
+  (rf/clear-subscription-cache!)
+  (rdc/render @root [views/root]))
+
+(defn init []
+  (rf/dispatch-sync [:init (lang)])
+  (mount!))

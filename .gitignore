@@ -1,0 +1,7 @@
+node_modules/
+.shadow-cljs/
+target/
+dev/dev-js/
+docs/assets/js/cljs-runtime/
+docs/assets/js/manifest.edn
+.DS_Store

@@ -1,0 +1,21 @@
+{
+  "name": "urbest-references",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Landing page Références clients Urbest (FR/EN) — ClojureScript, shadow-cljs, reagent, re-frame",
+  "scripts": {
+    "dev": "shadow-cljs watch app",
+    "logos": "shadow-cljs compile tools && node target/tools.js logos",
+    "prerender": "shadow-cljs compile tools && node target/tools.js prerender",
+    "build": "npm run logos && shadow-cljs release app && npm run prerender",
+    "serve": "python3 -m http.server 8281 --directory docs"
+  },
+  "devDependencies": {
+    "shadow-cljs": "2.27.1",
+    "sharp": "0.35.5"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  }
+}

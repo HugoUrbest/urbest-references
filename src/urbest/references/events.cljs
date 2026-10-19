@@ -1,0 +1,73 @@
+(ns urbest.references.events
+  (:require [clojure.string :as str]
+            [re-frame.core :as rf]
+            [urbest.references.config :as config]
+            [urbest.references.db :as db]))
+
+;; ── Init ────────────────────────────────────────────────────────────────────
+
+(rf/reg-event-db
+ :init
+ (fn [_ [_ lang]]
+   (assoc db/default-db :lang lang)))
+
+;; ── Bandeaux de logos ───────────────────────────────────────────────────────
+
+(rf/reg-event-db
+ :toggle-marquee
+ (fn [db [_ id]]
+   (update db :paused #(if (contains? % id) (disj % id) (conj % id)))))
+
+;; ── Formulaire de démo ──────────────────────────────────────────────────────
+;; Même fonctionnement que landings.js sur urbest.io : envoi au script Google,
+;; puis redirection vers la page de confirmation de la langue courante.
+
+(rf/reg-event-fx
+ :submit-demo
+ (fn [{:keys [db]} [_ form-data]]
+   (when-not (= :sending (get-in db [:demo :status]))
+     {:db            (assoc-in db [:demo :status] :sending)
+      :urbest/post-demo {:form-data  form-data
+                         :on-success [:demo-sent]
+                         :on-failure [:demo-failed]
+                         :on-dev     [:demo-dev-sent]}})))
+
+(rf/reg-event-fx
+ :demo-sent
+ (fn [{:keys [db]} _]
+   {:urbest/redirect (config/demo-success-url (:lang db))}))
+
+(rf/reg-event-db
+ :demo-failed
+ (fn [db _]
+   (assoc-in db [:demo :status] :error)))
+
+(rf/reg-event-db
+ :demo-dev-sent
+ (fn [db _]
+   (assoc-in db [:demo :status] :dev-sent)))
+
+;; ── Effets ──────────────────────────────────────────────────────────────────
+
+(rf/reg-fx
+ :urbest/post-demo
+ (fn [{:keys [form-data on-success on-failure on-dev]}]
+   (if (str/blank? config/DEMO_ENDPOINT)
+     (do (js/console.info "Démo (dev) : formulaire non envoyé"
+                          (js/Object.fromEntries (.entries form-data)))
+         (rf/dispatch on-dev))
+     (-> (js/fetch (str config/DEMO_ENDPOINT "?" (js/URLSearchParams. form-data))
+                   #js {:method  "POST"
+                        :headers #js {"Content-type" "application/x-www-form-urlencoded; charset=UTF-8"}})
+         (.then #(.json %))
+         (.then (fn [^js data]
+                  (rf/dispatch (if (= "success" (.-result data)) on-success on-failure))))
+         (.catch #(rf/dispatch on-failure))))))
+
+(rf/reg-fx
+ :urbest/redirect
+ (fn [url]
+   ;; Suivi de conversion Capterra, présent sur les pages d'urbest.io.
+   (when-let [track (.-capterraTrackingListener js/window)]
+     (track))
+   (set! (.-href js/location) url)))
