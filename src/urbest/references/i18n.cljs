@@ -19,6 +19,7 @@
     :hero-title        "Un outil n'a de valeur que si les équipes s'en servent."
     :hero-lead         "Plus de 20 000 personnes utilisent Urbest pour signaler un problème, suivre une intervention et piloter la maintenance de leurs bâtiments. Voici une partie des organisations qui nous font confiance."
     :hero-stats        [{:value "+20 000" :label "utilisateurs"}
+                        {:value "+7 millions" :label "de m² gérés avec Urbest"}
                         {:value "8" :label "pays"}]
     :jump-label        "Aller aux références"
     :jump-sgfm         "Services généraux & FM"
@@ -83,6 +84,7 @@
     :hero-title        "Software only matters if teams actually use it."
     :hero-lead         "More than 20,000 people use Urbest to report issues, follow up on work orders and run maintenance across their buildings. Here are some of the organisations that trust us."
     :hero-stats        [{:value "20,000+" :label "users"}
+                        {:value "7M+" :label "m² managed with Urbest"}
                         {:value "8" :label "countries"}]
     :jump-label        "Go to references"
     :jump-sgfm         "Facility services & FM"
